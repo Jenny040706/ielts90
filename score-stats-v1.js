@@ -172,10 +172,10 @@ statsPage=function(){
   if(!Array.from(table.querySelectorAll('thead th')).some(th=>th.textContent.includes('日期')))return;
   table.style.cssText='width:100%;min-width:0;table-layout:fixed;font-size:11px';
   if(table.parentElement){table.parentElement.style.overflowX='visible';table.parentElement.style.minWidth='0'}
-  const widths=['32%','12%','21%','17%','18%'];
+  const widths=['28%','18%','20%','18%','16%'];
   table.querySelectorAll('tr').forEach(row=>{
    Array.from(row.children).forEach((cell,i)=>{
-    cell.style.padding='10px 3px';cell.style.width=widths[i]||'auto';
+    cell.style.padding='10px 4px';cell.style.width=widths[i]||'auto';cell.style.textAlign=i===0?'left':'center';
     cell.style.whiteSpace='nowrap';cell.style.fontSize='11px';cell.style.letterSpacing='0';
    });
   });
