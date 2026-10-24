@@ -13,7 +13,7 @@ const binary=atob(parts.join(''));const bytes=new Uint8Array(binary.length);
 for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
 const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),v=>v.toString(16).padStart(2,'0')).join('');
 if(hash!=='765185ac6077f6d6ea40429a51188f63b341d8e19563e7d8eb152cc5f91ae37a')throw new Error('文件完整性校验未通过');
-const html=new TextDecoder('utf-8',{fatal:true}).decode(bytes).replace('</body>', '<script src="word-progress-v1.js"><\/script><script src="score-stats-v1.js"><\/script></body>');
+const html=new TextDecoder('utf-8',{fatal:true}).decode(bytes).replace('</body>', '<script src="word-progress-v1.js"><\/script><script src="score-stats-v1.js?v=form3"><\/script></body>');
 document.open();document.write(html);document.close();
 }catch(error){
 document.getElementById('status').textContent='加载未完成，请检查网络后重试。'+error.message;
