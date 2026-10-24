@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>IELTS9.0</title><style>body{margin:0;background:#f4f8f5;color:#24483e;font-family:system-ui,sans-serif;display:grid;place-items:center;min-height:100vh}.card{padding:32px;max-width:480px}p{line-height:1.8}button{padding:10px 20px;border:0;border-radius:12px;background:#367b66;color:white}</style></head><body><main class="card"><h1>IELTS9.0</h1><p id="status" role="status">正在加载完整学习工作台和内嵌资料，请稍候……</p><button hidden id="retry" onclick="location.reload()">重新加载</button></main><script>
+(async()=>{
+try{
+const parts=new Array(21);let next=0,done=0;
+await Promise.all(Array.from({length:4},async()=>{
+while(next<parts.length){const i=next++;const response=await fetch('app-data/part-'+String(i).padStart(2,'0')+'.txt');
+if(!response.ok)throw new Error('HTTP '+response.status);
+parts[i]=await response.text();done++;
+document.getElementById('status').textContent='正在加载完整工作台：'+Math.round(done/parts.length*100)+'%';}
+}));
+const binary=atob(parts.join(''));const bytes=new Uint8Array(binary.length);
+for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),v=>v.toString(16).padStart(2,'0')).join('');
+if(hash!=='765185ac6077f6d6ea40429a51188f63b341d8e19563e7d8eb152cc5f91ae37a')throw new Error('文件完整性校验未通过');
+const html=new TextDecoder('utf-8',{fatal:true}).decode(bytes);
+document.open();document.write(html);document.close();
+}catch(error){
+document.getElementById('status').textContent='加载未完成，请检查网络后重试。'+error.message;
+document.getElementById('retry').hidden=false;
+}
+})();
+</script></body></html>
