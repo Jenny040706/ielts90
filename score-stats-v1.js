@@ -100,3 +100,22 @@ toast=function(message){
  notice.textContent=message;notice.scrollIntoView({block:'nearest'});
 };
 
+
+const statsWithoutPositionColumn=statsPage;
+statsPage=function(){
+ const holder=document.createElement('div');holder.innerHTML=statsWithoutPositionColumn();
+ holder.querySelectorAll('table.records').forEach(table=>{
+  const headers=Array.from(table.querySelectorAll('thead th'));
+  const index=headers.findIndex(th=>/错题位置\s*\/\s*原因/.test(th.textContent));
+  if(index<0)return;
+  table.querySelectorAll('tr').forEach(row=>{
+   const cells=Array.from(row.children);
+   if(cells.length===headers.length)cells[index].remove();
+   else cells.forEach(cell=>{if(cell.colSpan>1)cell.colSpan=Math.max(1,cell.colSpan-1)});
+  });
+ });
+ holder.querySelectorAll('h2').forEach(h=>{h.textContent=h.textContent.replace('练习记录与错题位置','练习记录')});
+ return holder.innerHTML;
+};
+render();
+
