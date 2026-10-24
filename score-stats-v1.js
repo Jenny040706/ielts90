@@ -139,3 +139,28 @@ statsPage=function(){
 };
 render();
 
+
+const statsCompactRecords=statsPage;
+statsPage=function(){
+ const holder=document.createElement('div');holder.innerHTML=statsCompactRecords();
+ holder.querySelectorAll('table.records').forEach(table=>{
+  const headers=Array.from(table.querySelectorAll('thead th'));
+  if(!headers.some(th=>th.textContent.includes('日期')))return;
+  table.style.minWidth='560px';table.style.tableLayout='auto';table.style.width='100%';
+  if(table.parentElement)table.parentElement.style.overflowX='auto';
+  headers.forEach(th=>{th.style.whiteSpace='nowrap'});
+  table.querySelectorAll('tbody tr').forEach(row=>{
+   Array.from(row.children).forEach(cell=>{cell.style.whiteSpace='nowrap';cell.style.verticalAlign='middle';cell.style.lineHeight='1.8'});
+   const buttons=row.querySelectorAll('button');
+   if(buttons.length>1){
+    const cell=buttons[0].parentElement;
+    const wrap=document.createElement('div');wrap.style.cssText='display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:4px 0';
+    buttons.forEach(button=>wrap.appendChild(button));
+    cell.replaceChildren(wrap);
+   }
+  });
+ });
+ return holder.innerHTML;
+};
+render();
+
