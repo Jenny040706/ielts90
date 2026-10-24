@@ -78,3 +78,25 @@ drawScoreInputs=function(){
 };
 render();
 
+
+/* Visible form revision and dialog-local notifications. */
+const scoreFormV2=recordForm;
+recordForm=function(id){
+ scoreFormV2(id);
+ $('#modalTitle').textContent='记录真实练习表现 · 表单 v3';
+ const actions=$('#modalBody .modalactions');
+ $('#modalBody').appendChild(actions);
+ const button=actions.querySelector('button.primary');
+ button.onclick=()=>saveRecord(id||'');
+ const error=$('#scoreFormError');
+ error.style.position='sticky';error.style.bottom='0';error.style.background='#fff3ef';error.style.padding='12px';error.style.borderRadius='8px';
+};
+const scoreToastBefore=toast;
+toast=function(message){
+ scoreToastBefore(message);
+ if(!$('#modal')?.open)return;
+ let notice=$('#dialogNotification');
+ if(!notice){notice=document.createElement('p');notice.id='dialogNotification';notice.setAttribute('role','alert');notice.style.cssText='position:sticky;bottom:0;background:#fff3ef;color:#9c3b30;padding:12px;border-radius:8px;z-index:2';$('#modalBody').appendChild(notice)}
+ notice.textContent=message;notice.scrollIntoView({block:'nearest'});
+};
+
