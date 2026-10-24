@@ -119,3 +119,23 @@ statsPage=function(){
 };
 render();
 
+
+const statsReadableLayout=statsPage;
+statsPage=function(){
+ const holder=document.createElement('div');holder.innerHTML=statsReadableLayout();
+ holder.querySelectorAll('h2,h3').forEach(h=>{h.textContent=h.textContent.replace(/^(?:阅读|听力)\s*[·•]\s*/,'')});
+ holder.querySelectorAll('.twocol').forEach(row=>{
+  row.style.gridTemplateColumns='repeat(auto-fit,minmax(min(100%,280px),1fr))';
+ });
+ holder.querySelectorAll('.card').forEach(card=>{card.style.minWidth='0'});
+ holder.querySelectorAll('.card p,.card .fine,.card .caption').forEach(p=>{
+  p.style.textAlign='justify';
+  p.style.textJustify='inter-ideograph';
+  p.style.wordBreak='normal';
+  p.style.overflowWrap='break-word';
+  p.style.textWrap='pretty';
+ });
+ return holder.innerHTML;
+};
+render();
+
