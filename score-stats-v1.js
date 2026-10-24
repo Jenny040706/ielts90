@@ -60,7 +60,7 @@ saveRecord=function(id){
    if(reading&&sections.reduce((n,s)=>n+(s.minutes||0),0)>Number($('#rm').value)+.15)
     return scoreFormError('各篇已填写用时之和超过整场用时，请补充整场用时，或填全三篇用时自动合计。');
   }
-  const errors=$('#re').value.trim()?$('#re').value.split(/\r?\n/).filter(l=>l.trim()).map(l=>{const[type,count]=l.split('|');return{type:type?.trim(),count:Number(count)}}):[];
+  const errors=typeof collectErrorOptions==='function'?collectErrorOptions():$('#re').value.trim()?$('#re').value.split(/\r?\n/).filter(l=>l.trim()).map(l=>{const[type,count]=l.split('|');return{type:type?.trim(),count:Number(count)}}):[];
   const r={id:id||uid(),date:$('#rd').value,book:$('#rb').value.trim(),skill:$('#rs').value,minutes:Number($('#rm').value),correct:Number($('#rc').value),total:Number($('#rt').value),errors,positions:$('#rp').value,sections:any?sections:[]};
   if(!validRecord(r))return scoreFormError('请检查日期（不能晚于今天）、真题编号、总题数（1–100）及整场用时（大于0）。错因题数合计不能超过错题数。');
   const i=state.records.findIndex(x=>x.id===id);
