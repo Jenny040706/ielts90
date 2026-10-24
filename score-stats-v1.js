@@ -28,3 +28,53 @@ resultCSV=function(results){
  return '\ufeff'+rows.map(row=>row.map(v=>{let t=String(v??'');if(/^[=+\-@\t\r]/.test(t))t="'"+t;return '"'+t.replaceAll('"','""')+'"'}).join(',')).join('\r\n')
 };
 render();
+
+
+/* Keep section inputs before the save button and show validation inside the dialog. */
+recordForm=function(id){
+ scoreOldForm(id);
+ const r=state.records.find(r=>r.id===id);
+ window.scoreFormSections=r?practiceSections(r):[];
+ $('#modalBody .modalactions').insertAdjacentHTML('beforebegin','<div id="scoreSectionInputs"></div><p id="scoreFormError" role="alert" style="color:#a13d35" hidden></p>');
+ $('#rs').addEventListener('change',()=>{window.scoreFormSections=[];drawScoreInputs()});
+ drawScoreInputs();
+};
+function scoreFormError(message){
+ const el=$('#scoreFormError');el.hidden=false;el.textContent=message;el.scrollIntoView({block:'nearest'});
+}
+saveRecord=function(id){
+ try{
+  const reading=$('#rs').value==='阅读',sections=[];
+  let any=false;
+  for(let i=0;i<(reading?3:4);i++){
+   const t=$('#st-'+i).value.trim(),c=$('#sc-'+i).value.trim(),m=reading?$('#sm-'+i).value.trim():'';
+   if(t!==''||c!==''||m!=='')any=true;
+   sections.push({section:i+1,total:t===''?null:Number(t),correct:c===''?null:Number(c),...(reading?{minutes:m===''?null:Number(m)}:{})});
+  }
+  if(any){
+   if(sections.some(s=>!Number.isInteger(s.total)||s.total<1||s.total>40||!Number.isInteger(s.correct)||s.correct<0||s.correct>s.total||s.minutes!=null&&(!Number.isFinite(s.minutes)||s.minutes<0)))
+    return scoreFormError('请填写每部分的题量和答对数（答对0题请填0）；阅读用时可留空。答对数不能超过题量。');
+   $('#rt').value=sections.reduce((n,s)=>n+s.total,0);
+   $('#rc').value=sections.reduce((n,s)=>n+s.correct,0);
+   if(reading&&sections.every(s=>s.minutes!==null))$('#rm').value=Math.round(sections.reduce((n,s)=>n+s.minutes,0)*100)/100;
+   if(reading&&sections.reduce((n,s)=>n+(s.minutes||0),0)>Number($('#rm').value)+.15)
+    return scoreFormError('各篇已填写用时之和超过整场用时，请补充整场用时，或填全三篇用时自动合计。');
+  }
+  const errors=$('#re').value.trim()?$('#re').value.split(/\r?\n/).filter(l=>l.trim()).map(l=>{const[type,count]=l.split('|');return{type:type?.trim(),count:Number(count)}}):[];
+  const r={id:id||uid(),date:$('#rd').value,book:$('#rb').value.trim(),skill:$('#rs').value,minutes:Number($('#rm').value),correct:Number($('#rc').value),total:Number($('#rt').value),errors,positions:$('#rp').value,sections:any?sections:[]};
+  if(!validRecord(r))return scoreFormError('请检查日期（不能晚于今天）、真题编号、总题数（1–100）及整场用时（大于0）。错因题数合计不能超过错题数。');
+  const i=state.records.findIndex(x=>x.id===id);
+  if(i<0)state.records.push(r);else state.records[i]=r;
+  save();closeModal();render();toast('练习已保存，分部分统计已更新');
+ }catch(error){scoreFormError('保存未完成：'+error.message)}
+};
+const scoreDrawInputs=drawScoreInputs;
+drawScoreInputs=function(){
+ scoreDrawInputs();
+ const area=$('#scoreSectionInputs');
+ area.querySelector('p').textContent='填写各部分后，自动合计整套题量和答对数；三篇阅读用时全部填好后，也会自动合计总用时。分部分信息也可全部留空。';
+ area.querySelectorAll('label').forEach(label=>{label.style.display='flex';label.style.flexDirection='column';label.style.gap='6px';label.style.minWidth='0'});
+ area.querySelectorAll('input').forEach(input=>{input.style.width='100%';input.style.minWidth='0';input.style.pointerEvents='auto'});
+};
+render();
+
