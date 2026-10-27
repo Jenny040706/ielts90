@@ -64,3 +64,27 @@ statsPage=function(){
 if(ptab==='computer')ptab='stats';
 if(typeof examTick!=='undefined'&&examTick)pauseExam(false);
 render();
+
+
+const compactReviewStats=statsPage;
+statsPage=function(){
+ const holder=document.createElement('div');holder.innerHTML=compactReviewStats();
+ const findCard=label=>Array.from(holder.querySelectorAll('.card')).find(card=>Array.from(card.querySelectorAll('h2,h3')).some(h=>h.textContent.trim()===label||h.textContent.trim().endsWith(label)));
+ const chart=findCard('分数趋势');
+ const panels=['错误类型分布','练习记录','分部分统计'].map(findCard).filter(Boolean);
+ const metrics=Array.from(holder.querySelectorAll('.stats')).find(grid=>Array.from(grid.children).filter(el=>el.classList.contains('stat')).length===3);
+ if(metrics&&chart){
+  const grid=document.createElement('div');grid.className='review-equal-panels';
+  panels.forEach(card=>{card.style.margin='0';card.classList.add('review-equal-card');grid.appendChild(card)});
+  const counts=Array.from(metrics.children).filter(el=>el.classList.contains('stat'));
+  metrics.replaceChildren(...counts);metrics.style.gridTemplateColumns='repeat(3,minmax(0,1fr))';
+  metrics.after(chart);chart.after(grid);
+  chart.classList.add('review-compact-chart');chart.style.margin='0 0 18px';
+ }
+ const style=document.createElement('style');
+ style.textContent='.review-compact-chart{padding:18px 22px}.review-compact-chart h2{font-size:17px;margin:0 0 8px}.review-compact-chart svg{height:180px!important;max-width:740px;margin:0 auto}.review-compact-chart>p{font-size:11px;margin:6px 0}.review-equal-panels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-items:stretch;margin-bottom:20px}.review-equal-panels>.review-equal-card{height:440px;min-width:0;overflow:auto;padding:22px}.review-equal-card h2,.review-equal-card h3{font-size:17px;line-height:1.5;margin:0 0 18px}.review-equal-card .cardhead{min-height:40px;align-items:flex-start}.review-equal-card .notice{font-size:11px;padding:10px;line-height:1.7}@media(max-width:1100px){.review-equal-panels{grid-template-columns:1fr}.review-equal-panels>.review-equal-card{height:400px}.review-compact-chart svg{height:160px!important}}';
+ holder.prepend(style);
+ return holder.innerHTML;
+};
+render();
+
